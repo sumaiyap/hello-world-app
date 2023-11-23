@@ -1,0 +1,76 @@
+Master:
+  Name: jenkins-master
+  Image: "jenkins/jenkins"
+  ImageTag: "2.319.3"  # Update to the latest Jenkins version
+  ImagePullPolicy: "Always"
+  Component: "jenkins-master"
+  UseSecurity: true
+  AdminUser: admin
+  Cpu: "200m"
+  Memory: "1Gi"
+  ServicePort: 8080
+  ServiceType: NodePort
+  NodePort: 32000
+  ServiceAnnotations: {}
+  ContainerPort: 8080
+  HealthProbes: true
+  HealthProbesTimeout: 60
+  SlaveListenerPort: 50000
+  LoadBalancerSourceRanges:
+    - 0.0.0.0/0
+  InstallPlugins:
+    - kubernetes:1.30.1  # Update Kubernetes plugin version
+    - workflow-aggregator:2.8  # Update workflow aggregator version
+    - workflow-job:2.40  # Update workflow job version
+    - credentials-binding:1.33  # Update credentials binding version
+    - git:4.11.0  # Update Git plugin version
+    - git-client:3.15.0  # Update Git client version
+    - greenballs:1.21  # Update greenballs plugin version
+    - ws-cleanup:0.41  # Update ws-cleanup plugin version
+  ScriptApproval:
+    - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
+    - "new groovy.json.JsonSlurperClassic"
+    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods leftShift java.util.Map java.util.Map"
+    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods split java.lang.String"
+  CustomConfigMap: false
+  NodeSelector: {}
+  Tolerations: {}
+
+Agent:
+  Enabled: true
+  Image: jenkins/jnlp-slave
+  ImageTag: 4.12-1  # Update Jenkins agent version
+  Component: "jenkins-slave"
+  Privileged: false
+  Cpu: "200m"
+  Memory: "512Mi"
+  AlwaysPullImage: false
+  volumes:
+    - type: HostPath
+      hostPath: /var/run/docker.sock
+      mountPath: /var/run/docker.sock
+  NodeSelector: {}
+
+Persistence:
+  Enabled: true
+  StorageClass: jenkins-pv
+  Annotations: {}
+  AccessMode: ReadWriteOnce
+  Size: 20Gi
+  volumes: []
+  mounts: []
+
+networkPolicy:
+  Enabled: false
+  networkPolicy:
+    apiVersion: networking.k8s.io/v1 
+
+
+
+rbac:
+  create: true
+  apiVersion: v1beta1
+
+
+serviceAccount:
+  name: upgrad  # Updated field name
