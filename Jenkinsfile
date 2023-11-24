@@ -3,6 +3,7 @@ pipeline {
     environment {
         registry = "sumaiyap/helloworld"
         registryCredential = 'docker-hub-credentials'
+        DOCKERHUB_CREDENTIALS = credentials('docker-cred')
     
     }
 
@@ -21,7 +22,8 @@ pipeline {
         stage('Push') {
             steps {
                 script {
-                    sh "docker login -u sumaiyap -p$docker"
+                    sh "echo $DOCKERHUB_CREDENTIALS"
+                    sh "docker login -u sumaiyap -p$DOCKERHUB_CREDENTIALS"
                     sh "docker push $registry:$BUILD_NUMBER"
                 }
             }
@@ -30,6 +32,20 @@ pipeline {
         stage('Cleaning up') {
             steps {
                 sh "docker rmi $registry:$BUILD_NUMBER"
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    dir('kubernetes') {
+                        def imageName = "$registry:$BUILD_NUMBER"
+                    
+                        sh "kubectl apply -f deployment.yaml --namespace=upgrad"  
+                        sh "kubectl apply -f service.yaml --namespace=upgrad"                   
+                        sh "kubectl set image deployment/hello-world-app hello-world-app=${imageName} --namespace=upgrad" 
+                    } 
+                }
             }
         }
     }
