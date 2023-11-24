@@ -4,6 +4,7 @@ metadata:
   name: hello-world-app
 spec:
   replicas: 2
+  selector:
     matchLabels:
       app: hello-world
   template:
@@ -13,6 +14,7 @@ spec:
     spec:
       containers:
       - name: hello-world-app
-        image: sumaiyap/helloworld:1  
+        image: sumaiyap/helloworld:20 
         ports:
         - containerPort: 8000  
+
