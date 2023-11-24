@@ -10,7 +10,7 @@ pipeline {
             steps {
                 script {
                     dir('hello-world-app') {
-   ]
+
                         dockerImage = docker.build registry + ":$BUILD_NUMBER"
                     }
                 }
