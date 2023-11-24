@@ -3,7 +3,7 @@ pipeline {
     environment {
         registry = "sumaiyap/helloworld"
         registryCredential = 'docker-hub-credentials'
-        DOCKERHUB_CREDENTIALS_PSW = 'docker'
+    
     }
 
     stages {
@@ -21,7 +21,7 @@ pipeline {
         stage('Push') {
             steps {
                 script {
-                    sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u sumaiyap --password-stdin"
+                    sh "docker login -u sumaiyap -p$docker"
                     sh "docker push $registry:$BUILD_NUMBER"
                 }
             }
