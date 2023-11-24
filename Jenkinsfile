@@ -9,8 +9,10 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sh "cd hello-world-app/"
-                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                    dir('hello-world-app') {
+   ]
+                        dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                    }
                 }
             }
         }
